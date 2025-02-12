@@ -46,6 +46,48 @@ async function run() {
       res.send(projects);
     });
 
+    app.post("/projects", async (req, res) => {
+      const project = req.body;
+      const result = await projectCollection.insertOne(project);
+      res.send(result);
+    });
+
+    app.patch("/projects/:id", async (req, res) => {
+      const id = req.params.id;
+      const {
+        title,
+        sub_title,
+        image,
+        full_image,
+        technologies,
+        features,
+        live_link,
+      } = req.body;
+
+      const filter = { _id: new ObjectId(id) };
+
+      const updateDoc = {
+        $set: {
+          title,
+          sub_title,
+          image,
+          full_image,
+          technologies,
+          features,
+          live_link,
+        },
+      };
+      const result = await projectCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    app.delete("/projects/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await projectCollection.deleteOne(query);
+      res.send(result);
+    });
+
     app.get("/message", async (req, res) => {
       const message = await messageCollection.find().toArray();
       res.send(message);
@@ -99,14 +141,12 @@ async function run() {
       res.send(result);
     });
 
-
     app.delete("/blogs/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await blogCollection.deleteOne(query);
       res.send(result);
     });
-
 
     // User Registration
     app.post("/register", async (req, res) => {
